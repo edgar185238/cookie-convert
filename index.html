@@ -34,6 +34,7 @@
             max-width: 600px;
             width: 100%;
             box-sizing: border-box;
+            position: relative;
         }
         label {
             font-weight: bold;
@@ -67,14 +68,63 @@
         input[type="submit"]:hover, button:hover {
             background-color: #45a049;
         }
+        .output-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            display: none; /* Hide the output container initially */
+        }
+        .output-title {
+            display: none; /* Hide the title initially */
+            margin-top: 4px;
+        }
         pre {
             background: #f1f1f1;
             padding: 20px;
             border-radius: 4px;
             overflow-x: auto;
             max-height: 300px;
+            margin: 0;
+        }
+        .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 24px;
+            cursor: pointer;
+            font-size: 24px; /* Updated size for better appearance */
+            color: #4CAF50;
+            transition: color 0.3s;
+        }
+        .copy-icon:hover {
+            color: #45a049;
+        }
+        /* Toast notification styles */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin: 0 auto;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 17px;
+            white-space: nowrap;
+            padding: 16px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
+    <script src="https://kit.fontawesome.com/a8ad65b2b4.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="container">
@@ -85,10 +135,18 @@
             <textarea id="cookieHeader" name="cookieHeader" rows="4" cols="50"></textarea><br>
             <input type="submit" value="Chuyển Đổi">
         </form>
-        <h2>Kết Quả JSON:</h2>
-        <pre id="jsonOutput"></pre>
+        <div class="output-title">
+            <h2>Kết Quả JSON:</h2>
+        </div>
+        <div class="output-container">
+            <pre id="jsonOutput"></pre>
+            <span id="copyIcon" class="copy-icon"><i class="fa-regular fa-copy"></i></span>
+        </div>
         <button id="downloadBtn" style="display: none;">Tải xuống JSON</button>
     </div>
+
+    <!-- Toast notification element -->
+    <div id="toast" class="toast">JSON đã được sao chép vào clipboard!</div>
 
     <script>
         document.getElementById('cookieForm').addEventListener('submit', function(event) {
@@ -125,6 +183,11 @@
             const jsonOutput = JSON.stringify(cookies, null, 2);
             document.getElementById('jsonOutput').textContent = jsonOutput;
 
+            const outputContainer = document.querySelector('.output-container');
+            const outputTitle = document.querySelector('.output-title');
+            outputContainer.style.display = 'block'; // Show the output container
+            outputTitle.style.display = 'block'; // Show the title
+
             const downloadBtn = document.getElementById('downloadBtn');
             downloadBtn.style.display = 'inline-block';
             downloadBtn.addEventListener('click', function() {
@@ -138,7 +201,26 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
+
+            const copyIcon = document.getElementById('copyIcon');
+            copyIcon.style.display = 'inline'; // Ensure the icon is visible
+            copyIcon.addEventListener('click', function() {
+                navigator.clipboard.writeText(jsonOutput).then(() => {
+                    showToast('JSON đã được sao chép vào clipboard!');
+                }).catch(err => {
+                    console.error('Lỗi sao chép vào clipboard: ', err);
+                });
+            });
         });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            setTimeout(() => {
+                toast.className = toast.className.replace('show', '');
+            }, 3000); // Hide the toast after 3 seconds
+        }
     </script>
 </body>
 </html>
