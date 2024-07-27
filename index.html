@@ -134,7 +134,7 @@
         <h1>Chuyển Đổi</h1>
         <h2>Cookie Header String => Cookie JSON</h2>
         <form id="cookieForm">
-            <label for="cookieHeader">Nhập Cookie Header:</label>
+            <label for="cookieHeader">Nhập Cookie Header String:</label>
             <textarea id="cookieHeader" name="cookieHeader" rows="4" cols="50"></textarea><br>
             <input type="submit" value="Chuyển Đổi">
         </form>
@@ -157,7 +157,7 @@
             const cookieHeader = document.getElementById('cookieHeader').value;
             const cookies = [];
             const defaultCookieProps = {
-                domain: 'www.example.com',
+                domain: 'www.tiktok.com',
                 hostOnly: true,
                 path: '/',
                 secure: false,
