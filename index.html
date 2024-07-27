@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Chuyển Đổi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1, h2 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 4px;
+        }
+        h2 {
+            margin-top: 4px;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+        }
+        input[type="submit"], button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 20px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chuyển Đổi</h1>
+        <h2>Cookie Header String => Cookie JSON</h2>
+        <form id="cookieForm">
+            <label for="cookieHeader">Nhập Cookie Header:</label>
+            <textarea id="cookieHeader" name="cookieHeader" rows="4" cols="50"></textarea><br>
+            <input type="submit" value="Chuyển Đổi">
+        </form>
+        <h2>Kết Quả JSON:</h2>
+        <pre id="jsonOutput"></pre>
+        <button id="downloadBtn" style="display: none;">Tải xuống JSON</button>
+    </div>
+
+    <script>
+        document.getElementById('cookieForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const cookieHeader = document.getElementById('cookieHeader').value;
+            const cookies = [];
+            const defaultCookieProps = {
+                domain: 'www.example.com',
+                hostOnly: true,
+                path: '/',
+                secure: false,
+                httpOnly: false,
+                sameSite: 'no_restriction',
+                session: true,
+                firstPartyDomain: '',
+                partitionKey: null,
+                storeId: null
+            };
+
+            if (cookieHeader) {
+                const cookiePairs = cookieHeader.split(';');
+                cookiePairs.forEach(pair => {
+                    const [key, value] = pair.trim().split('=');
+                    if (key && value) {
+                        cookies.push({
+                            name: key,
+                            value: value,
+                            ...defaultCookieProps
+                        });
+                    }
+                });
+            }
+
+            const jsonOutput = JSON.stringify(cookies, null, 2);
+            document.getElementById('jsonOutput').textContent = jsonOutput;
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.style.display = 'inline-block';
+            downloadBtn.addEventListener('click', function() {
+                const blob = new Blob([jsonOutput], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'cookies.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+</body>
+</html>
